@@ -19,8 +19,6 @@ sub new {
   $self->{loginName} = $args->{loginName} || croak "must supply a loginName";
   $self->{password}  = $args->{password}  || croak "must supply a password";
 
-  $self->{psnID}     = $args->{psnID}     || croak "must supply psnID";
-
   $self->{returnURL} = "$self->{server}/signin/index.do";
 
   $self->{mech}      = WWW::Mechanize->new();
@@ -50,9 +48,10 @@ sub login {
 
 sub profile {
   my $self = shift;
+  my $psn  = shift;
   my $mech = $self->{mech};
 
-  $mech->post($self->{server}."/api/gt5/profile/", [online_id => $self->{psnID}]);
+  $mech->post($self->{server}."/api/gt5/profile/", [online_id => $psn]);
   my $json_str = $mech->content;
 
   return decode_json($json_str);
