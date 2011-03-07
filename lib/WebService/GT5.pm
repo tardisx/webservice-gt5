@@ -141,10 +141,10 @@ sub get_events {
           $event_max_drivers = shift @matches;
           $event_id = shift @matches;
           $event_title = shift @matches;
-          push @$output, { time => $event_time,
+          push @$output, { time        => $event_time,
                            max_drivers => $event_max_drivers,
-                           title => $event_title,
-                           id => $event_id, };
+                           title       => $event_title,
+                           id          => $event_id, };
       }
 
       # HORROR
