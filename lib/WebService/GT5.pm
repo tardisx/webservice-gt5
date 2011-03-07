@@ -173,6 +173,31 @@ sub get_events {
   }
 }
 
+=head1 select_event
+
+Select an event to race in.
+
+=cut
+
+sub select_event {
+  my $self = shift;
+  my $psn  = shift;
+  my $id   = shift;
+
+  my $mech = $self->{mech};
+
+  $mech->post($self->{server}."/gt5/user/".$psn."/remoterace/", [ article_id => $id ]);
+
+  if ($mech->success()) {
+      die $mech->content;
+
+  }
+  else {
+    warn $mech->response->status_line();
+    croak "something went wrong with remoterace call";
+  }
+}
+
 =head2 reserve_driver
 
 Reserve a driver for an upcoming race.
