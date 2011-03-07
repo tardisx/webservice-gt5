@@ -8,6 +8,12 @@ use URI::Escape;
 use JSON qw/decode_json/;
 use Carp qw/croak/;
 
+=head2 new
+
+Create a new WebService::GT5 object.
+
+=cut
+
 sub new {
   my ($class, $args) = @_;
 
@@ -26,6 +32,12 @@ sub new {
   bless $self, __PACKAGE__;
   return $self;
 }
+
+=head2 login
+
+Login to the web API.
+
+=cut
 
 sub login {
   my $self = shift;
@@ -46,22 +58,85 @@ sub login {
   # now we can do JSON!
 }
 
+=head2 profile
+
+Returns a users profile
+
+=cut
+
 sub profile {
   my $self = shift;
   my $psn  = shift;
   my $mech = $self->{mech};
 
   $mech->post($self->{server}."/api/gt5/profile/", [online_id => $psn]);
-  my $json_str = $mech->content;
 
-  return decode_json($json_str);
+  if ($mech->success()) {
+    my $json_str = $mech->content;
+    return decode_json($json_str);
+  }
+  else {
+    warn $mech->response->status_line();
+    croak "something went wrong with profile call";
+  }
+
 }
+
+=head2 get_driver_list
+
+Returns the list of drivers.
+
+=cut
+
+sub get_driver_list {
+  my $self = shift;
+  my $psn  = shift;
+
+  my $mech = $self->{mech};
+
+  $mech->post($self->{server}."/api/gt5/remoterace/", [job => "2", online_id => $psn, '_' => ""]);
+
+  if ($mech->success()) {
+    my $json_str = $mech->content;
+    return decode_json($json_str);
+  }
+  else {
+    warn $mech->response->status_line();
+    croak "something went wrong with remoterace call";
+  }
+}
+
+=head2 reserve_driver
+
+Reserve a driver for an upcoming race.
+
+=cut
+
+sub reserve_driver {
+  my $self = shift;
+  my $psn  = shift;
+  my $driver_id = shift;
+
+  my $mech = $self->{mech};
+
+  $mech->post($self->{server}."/api/gt5/remoterace/", [job => "3", driver_id => $driver_id, online_id => $psn, '_' => ""]);
+
+  if ($mech->success()) {
+    my $json_str = $mech->content;
+    return decode_json($json_str);
+  }
+  else {
+    warn $mech->response->status_line();
+    croak "something went wrong with remoterace call";
+  }
+}
+
 
 
 
 =head1 NAME
 
-WebService::GT5 - The great new WebService::GT5!
+WebService::GT5 - Interface with the Gran Turismo 5 Web API
 
 =head1 VERSION
 
